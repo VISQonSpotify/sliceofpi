@@ -20,29 +20,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node (enables corepack -> yarn)
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Enable corepack (Yarn)
+        run: corepack enable
+
+      - name: Install dependencies (Yarn)
         working-directory: frontend
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
+          if [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
           else
-            npm install
+            npm ci
           fi
 
-      - name: Build frontend
+      - name: Build frontend (React CRA)
         working-directory: frontend
         env:
           GENERATE_SOURCEMAP: "false"
-        run: npm run build
+        run: |
+          if [ -f yarn.lock ]; then
+            yarn build
+          else
+            npm run build
+          fi
 
-      # Ensure your domain + Pi validation are present in the deployed site
+      # Ensure your domain + Pi validation are in the deployed site
       - name: Copy domain + Pi verification into build
         run: |
           mkdir -p frontend/build/.well-known
@@ -57,6 +63,4 @@ jobs:
         with:
           path: frontend/build
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name:
