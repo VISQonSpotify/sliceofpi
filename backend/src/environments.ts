@@ -2,16 +2,15 @@ import dotenv from 'dotenv';
 
 console.log("NODE_ENV: " + process.env.NODE_ENV);
 
-const result = dotenv.config()
+const result = dotenv.config();
 
 if (result.error) {
   if (process.env.NODE_ENV === "development") {
     console.error(".env file not found. This is an error condition in development. Additional error is logged below");
     throw result.error;
   }
-
-  // In production, environment variables are injected into the container environment. We should not even have
-  // a .env file inside the running container.
+  // In production, environment variables are injected into the container environment. 
+  // We should not even have a .env file inside the running container.
 }
 
 interface Environment {
@@ -23,6 +22,7 @@ interface Environment {
   mongo_user: string,
   mongo_password: string,
   frontend_url: string,
+  mongo_uri?: string,   // ✅ new field
 }
 
 const env: Environment = {
@@ -34,6 +34,7 @@ const env: Environment = {
   mongo_user: process.env.MONGODB_USERNAME || '',
   mongo_password: process.env.MONGODB_PASSWORD || '',
   frontend_url: process.env.FRONTEND_URL || 'http://localhost:3314',
+  mongo_uri: process.env.MONGO_URI,   // ✅ picks up Atlas URI if provided
 };
 
 export default env;
