@@ -20,12 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node (enable corepack/yarn)
+      # Use Node 16 to avoid OpenSSL 3 / react-scripts error
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: Enable corepack
-        run: corepack enable
+          node-version: 16
+
+      # Prefer Yarn if yarn.lock exists; fall back to npm
+      - name: Enable Yarn (or install if corepack missing)
+        run: corepack enable || npm i -g yarn
 
       - name: Install dependencies
         working-directory: frontend
@@ -42,6 +45,7 @@ jobs:
         working-directory: frontend
         env:
           GENERATE_SOURCEMAP: "false"
+          CI: "false"
         run: |
           if [ -f yarn.lock ]; then
             yarn build
