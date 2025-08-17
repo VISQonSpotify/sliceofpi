@@ -32,7 +32,7 @@ jobs:
       - name: Build frontend (CRA)
         working-directory: frontend
         env:
-          GENERATE_SOURCEMAP: "false"   # set env var in CI
+          GENERATE_SOURCEMAP: "false"
         run: npm run build
 
       - name: Copy domain + Pi verification
@@ -41,19 +41,11 @@ jobs:
           cp -R .well-known/* frontend/build/.well-known/ 2>/dev/null || true
           cp CNAME frontend/build/ 2>/dev/null || true
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload production-ready build
+        uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/build
 
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
-
-        - name: Upload production-ready build
-  uses: actions/upload-pages-artifact@v3
-  with:
-    path: frontend/build
-
-- name: Deploy to GitHub Pages
-  id: deployment
-  uses: actions/deploy-pages@v4
-
